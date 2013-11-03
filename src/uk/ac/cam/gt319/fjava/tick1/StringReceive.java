@@ -9,42 +9,45 @@ public class StringReceive {
   private static Socket socket;
   
   public static void main(String[] args) throws IOException, InterruptedException {
-    parseArgs(args);
+    if (!parseArgs(args)) {
+      return;
+    };
     InputStream in = socket.getInputStream();
     byte[] bytes;
-    int bytesRead;
     String m;
     while (true) {
       bytes = new byte[1024];
-      bytesRead = in.read(bytes);
+      in.read(bytes);
       m = new String(bytes);
       System.out.println(m);
       Thread.sleep(100);
     }
   }
   
-  private static void parseArgs(String[] args) {
+  private static boolean parseArgs(String[] args) {
     int port = 0;
     if (args.length != 2) {
-      argsErrorAndExit();
+      argsError();
+      return false;
     }
     try {
       port = Integer.parseInt(args[1]);
       socket = new Socket(args[0], port);
     } catch (NumberFormatException e) {
-      argsErrorAndExit();
+      argsError();
+      return false;
     } catch (Exception e) {
-      connectionErrorAndExit(args[0], port);
+      connectionError(args[0], port);
+      return false;
     }
+    return true;
   }
   
-  private static void argsErrorAndExit() {
+  private static void argsError() {
     System.err.println("This application requires two arguments: <machine> <port>");
-    System.exit(1);
   }
   
-  private static void connectionErrorAndExit(String server, int port) {
+  private static void connectionError(String server, int port) {
     System.err.println(String.format("Cannot connect to %s on port %s", server, port));
-    System.exit(1);
   }
 }

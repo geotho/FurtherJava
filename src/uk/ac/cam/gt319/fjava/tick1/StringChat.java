@@ -15,18 +15,19 @@ public class StringChat {
     // Parse args
     int port = 0;
     if (args.length != 2) {
-      argsErrorAndExit();
+      argsError();
+      return;
     }
     try {
       port = Integer.parseInt(args[1]);
       // Socket s is final because objects must be final to be referenced from anonymous classes
       socket = new Socket(args[0], port);
     } catch (NumberFormatException e) {
-      socket.close();
-      argsErrorAndExit();
+      argsError();
+      return;
     } catch (Exception e) {
-      socket.close();
-      connectionErrorAndExit(args[0], port);
+      connectionError(args[0], port);
+      return;
     }
     
     final Socket s = socket;
@@ -36,11 +37,10 @@ public class StringChat {
         try {
           InputStream in = s.getInputStream();
           byte[] bytes;
-          int bytesRead;
           String m;
           while (true) {
             bytes = new byte[1024];
-            bytesRead = in.read(bytes);
+            in.read(bytes);
             m = new String(bytes);
             System.out.println(m);
             Thread.sleep(100);
@@ -65,16 +65,11 @@ public class StringChat {
     }
   }
   
-  private static void parseArgs(String[] args) {
-  }
-  
-  private static void argsErrorAndExit() {
+  private static void argsError() {
     System.err.println("This application requires two arguments: <machine> <port>");
-    System.exit(1);
   }
   
-  private static void connectionErrorAndExit(String server, int port) {
+  private static void connectionError(String server, int port) {
     System.err.println(String.format("Cannot connect to %s on port %s", server, port));
-    System.exit(1);
   }
 }
